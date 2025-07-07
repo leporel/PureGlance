@@ -1,0 +1,14 @@
+{
+  "name": "pureglance",
+  "version": "1.0.0",
+  "description": "Hides videos where a face occupies a large portion of the thumbnail.",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^0.10.22-rc.20250304"
+  },
+  "devDependencies": {
+    "fs-extra": "^11.2.0"
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>PureGlance</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="container">
+    <img src="../icons/icon48.png" alt="icon" class="header-icon"> <h1>PureGlance</h1>
+    <label class="switch">
+      <input type="checkbox" id="toggleSwitch">
+      <span class="slider round"></span>
+    </label>
+  </div>
+  <div id="settings-wrapper">
+    <div class="container">
+    <span>Enable Debug Logging</span>
+    <label class="switch small">
+      <input type="checkbox" id="toggleLogging">
+      <span class="slider round"></span>
+    </label>
+    </div>
+    <div class="container">
+      <span>Disable on Subscriptions page</span>
+      <label class="switch small">
+        <input type="checkbox" id="disableOnSubsSwitch">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div class="settings-container">
+      <div class="setting-label">
+        <span>Face Area Threshold</span>
+        <label class="switch small">
+            <input type="checkbox" id="enableAreaThreshold">
+            <span class="slider round"></span>
+        </label>
+      </div>
+      <div class="setting-control">
+        <input type="range" id="thresholdSlider" min="1" max="50" value="5">
+        <span id="thresholdValue">5%</span>
+      </div>
+    </div>
+    <div class="settings-container">
+      <div class="setting-label">
+          <span>Min Face Count</span>
+          <label class="switch small">
+              <input type="checkbox" id="enableFaceCount">
+              <span class="slider round"></span>
+          </label>
+      </div>
+      <div class="setting-control">
+        <input type="range" id="faceCountSlider" min="0" max="10" value="2">
+        <span id="faceCountValue">2</span>
+      </div>
+    </div>
+  </div>
+  <div id="videoCount">Hidden Videos on this page: 0</div>
+  <script src="popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "PureGlance",
+  "version": "1.0.0",
+  "description": "Hides videos where a face occupies a large portion of the thumbnail.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "storage",
+    "offscreen",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://*.ytimg.com/*",
+    "*://*.vk.com/*",
+    "*://*.vkvideo.ru/*",
+    "*://*.userapi.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "24": "icons/icon24.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.vk.com/*",
+        "*://*.vkvideo.ru/*"
+      ],
+      "js": [
+        "content_scripts/modules/youtube.js",
+        "content_scripts/modules/vkvideo.js",
+        "content_scripts/content.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "models/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    },
+    {
+      "resources": [
+        "node_modules/@mediapipe/tasks-vision/vision_bundle.mjs",
+        "node_modules/@mediapipe/tasks-vision/wasm/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  }
+}
