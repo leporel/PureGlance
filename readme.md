@@ -1,5 +1,7 @@
 # PureGlance
 
+<img src="./img/logo_2.png">
+
 PureGlance is a browser extension that helps you avoid clickbait by scanning video thumbnails for close-up faces. If a face takes up a significant portion of the thumbnail, the video is automatically hidden from your feed.
 
 ## How it works
