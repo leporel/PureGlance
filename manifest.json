@@ -11,14 +11,16 @@
   "permissions": [
     "storage",
     "offscreen",
-    "webNavigation"
+    "webNavigation",
+    "tabs"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",
     "*://*.ytimg.com/*",
     "*://*.vk.com/*",
     "*://*.vkvideo.ru/*",
-    "*://*.userapi.com/*"
+    "*://*.userapi.com/*",
+    "*://*.mycdn.me/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -57,6 +59,7 @@
     {
       "resources": [
         "node_modules/@mediapipe/tasks-vision/vision_bundle.mjs",
+        "node_modules/@mediapipe/tasks-vision/vision_bundle.cjs", 
         "node_modules/@mediapipe/tasks-vision/wasm/*"
       ],
       "matches": [

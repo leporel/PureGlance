@@ -1,3 +1,14 @@
+function getStorageData(keys) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(keys, (result) => {
+      if (chrome.runtime.lastError) {
+        return reject(chrome.runtime.lastError);
+      }
+      resolve(result);
+    });
+  });
+}
+
 let idCounter = 0;
 
 // 1. Site-specific module selection
@@ -8,7 +19,7 @@ let settings = {
   disableOnSubs: false,
 };
 
-chrome.storage.local.get({ disableOnSubs: false }, (data) => {
+getStorageData({ disableOnSubs: false }).then((data) => {
   settings.disableOnSubs = data.disableOnSubs;
 });
 
@@ -99,7 +110,7 @@ async function processThumbnail(element) {
         origHeight: img.naturalHeight,
       });
     } catch (e) {
-      const { isLoggingEnabled } = await chrome.storage.local.get({
+      const { isLoggingEnabled } = await getStorageData({
         isLoggingEnabled: false,
       });
       if (isLoggingEnabled && e.name === "SecurityError") {
