@@ -11,8 +11,7 @@
   "permissions": [
     "storage",
     "offscreen",
-    "webNavigation",
-    "tabs"
+    "webNavigation"
   ],
   "host_permissions": [
     "*://*.youtube.com/*",

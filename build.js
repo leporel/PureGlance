@@ -17,7 +17,6 @@ async function build() {
         const commonFiles = [
             'content_scripts',
             'icons',
-            'img',
             'models',
             'popup'
         ];
