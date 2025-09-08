@@ -143,7 +143,7 @@ async function processThumbnail(element) {
 
 // 3. Observers
 function scanForThumbnails() {
-  if (siteModule.isSubscriptionFeed() && settings.disableOnSubs) {
+  if ((siteModule.isSubscriptionFeed() && settings.disableOnSubs) || siteModule.isProtectedPages())  {
     unhideAllVideos();
     return;
   }
