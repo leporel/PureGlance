@@ -17,15 +17,29 @@ const hostname = window.location.hostname;
 
 let settings = {
   disableOnSubs: false,
+  isEnabled: true,
 };
 
-getStorageData({ disableOnSubs: false }).then((data) => {
+getStorageData({ disableOnSubs: false, isEnabled: true }).then((data) => {
   settings.disableOnSubs = data.disableOnSubs;
+  settings.isEnabled = data.isEnabled;
+  if (!settings.isEnabled) {
+    unhideAllVideos();
+  }
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === "local" && changes.disableOnSubs) {
     settings.disableOnSubs = changes.disableOnSubs.newValue;
+  }
+  if (namespace === "local" && changes.isEnabled) {
+    settings.isEnabled = changes.isEnabled.newValue;
+    if (!settings.isEnabled) {
+      unhideAllVideos();
+    } else {
+      // When enabling, re-scan to process existing thumbnails
+      scanForThumbnails();
+    }
   }
 });
 
@@ -64,7 +78,9 @@ function unhideAllVideos() {
   document.querySelectorAll('[data-pureglance-hidden="true"]').forEach((el) => {
     el.style.display = "";
     delete el.dataset.pureglanceHidden;
+    delete el.dataset.pureglanceId;
   });
+  chrome.runtime.sendMessage({ type: "RESET_COUNT" });
 }
 
 async function processThumbnail(element) {
@@ -91,6 +107,7 @@ async function processThumbnail(element) {
   img.crossOrigin = "Anonymous";
 
   img.onload = async () => {
+    if (!settings.isEnabled) return;
     // Downscale for faster detection
     const targetWidth = 480;
     const targetHeight = 270;
@@ -130,6 +147,7 @@ async function processThumbnail(element) {
   };
 
   img.onerror = () => {
+    if (!settings.isEnabled) return;
     // If image fails to load, send the URL for background processing
     chrome.runtime.sendMessage({
       type: "QUEUE_DETECTION",
@@ -143,7 +161,7 @@ async function processThumbnail(element) {
 
 // 3. Observers
 function scanForThumbnails() {
-  if ((siteModule.isSubscriptionFeed() && settings.disableOnSubs) || siteModule.isProtectedPages())  {
+  if (!settings.isEnabled || (siteModule.isSubscriptionFeed() && settings.disableOnSubs) || siteModule.isProtectedPages())  {
     unhideAllVideos();
     return;
   }
@@ -152,7 +170,7 @@ function scanForThumbnails() {
   }
   const thumbnails = document.querySelectorAll(siteModule.thumbnailSelector);
   thumbnails.forEach((element) => {
-    if (!element.dataset.pureglanceId) {
+    if (!element.dataset.pureglanceId || element.dataset.pureglanceId == '') {
       processThumbnail(element);
     }
   });

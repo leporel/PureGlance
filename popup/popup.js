@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Function to request video count with better error handling
   async function requestVideoCount() {
     if (!currentTabId) {
-      videoCountElement.textContent = "Hidden Videos on this page: N/A";
+      // videoCountElement.textContent = "Hidden Videos on this page: N/A";
       return;
     }
 
@@ -131,10 +131,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (response && typeof response.count !== "undefined") {
         videoCountElement.textContent = `Hidden Videos on this page: ${response.count}`;
       } else {
-        videoCountElement.textContent = "Hidden Videos on this page: N/A";
+        // videoCountElement.textContent = "Hidden Videos on this page: N/A";
       }
     } catch (error) {
-      console.error("PureGlance: Error getting video count:", error);
+      console.error('PureGlance: Error getting video count in tab: ${currentTabId}', error);
       videoCountElement.textContent = "Hidden Videos on this page: N/A";
     }
   }

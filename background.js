@@ -431,6 +431,13 @@ async function messageListener(request, sender, sendResponse) {
         sendResponse({});
       }
       return true;
+
+    case "RESET_COUNT":
+      if (sender && sender.tab && sender.tab.id) {
+        hiddenVideoCountPerTab.set(sender.tab.id, 0);
+        notifyPopupOfCountChange(sender.tab.id);
+      }
+      return true;
   }
   return true;
 }
