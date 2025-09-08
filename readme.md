@@ -1,3 +1,10 @@
+<span align="center">
+
+[![Chrome Version](https://img.shields.io/chrome-web-store/v/hifambahdidpghjhockkeedgidonohlc?label=Chrome)](https://chromewebstore.google.com/detail/pureglance/hifambahdidpghjhockkeedgidonohlc)
+[![Firefox Version](https://img.shields.io/amo/v/pureglance?label=Firefox)](https://addons.mozilla.org/ru/firefox/addon/pureglance/)
+
+</span>
+
 # PureGlance
 
 <img src="./img/logo_2.png">
