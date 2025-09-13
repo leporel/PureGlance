@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PureGlance",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Hides videos where a face occupies a large portion of the thumbnail.",
   "icons": {
     "16": "icons/icon16.png",
