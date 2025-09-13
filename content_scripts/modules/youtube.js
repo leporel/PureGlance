@@ -17,7 +17,7 @@ window.PureGlanceModules.youtube = {
       "ytd-grid-video-renderer", // Grid view (e.g., channel page)
       "ytd-compact-video-renderer", // Sidebar (up next)
       "ytd-video-renderer", // Subscriptions page
-      "ytd-watch-next-secondary-results-renderer", // End of video recommendations
+      "yt-lockup-view-model", // End of video recommendations
     ];
 
     for (const selector of selectors) {
@@ -28,7 +28,7 @@ window.PureGlanceModules.youtube = {
     }
     // Fallback for other potential layouts.
     return (
-      element.parentElement?.parentElement?.parentElement ||
+      element.parentElement?.parentElement ||
       element.parentElement
     );
   },
