@@ -15,16 +15,36 @@ let idCounter = 0;
 let siteModule;
 const hostname = window.location.hostname;
 
+if (hostname.includes("youtube.com")) {
+  siteModule = window.PureGlanceModules.youtube;
+} else if (hostname.includes("vk.com") || hostname.includes("vkvideo.ru")) {
+  siteModule = window.PureGlanceModules.vkvideo;
+}
+
 let settings = {
-  disableOnSubs: false,
+  disableOnSubs: true,
   isEnabled: true,
 };
 
-getStorageData({ disableOnSubs: false, isEnabled: true }).then((data) => {
-  settings.disableOnSubs = data.disableOnSubs;
-  settings.isEnabled = data.isEnabled;
+getStorageData({ disableOnSubs: true, isEnabled: true, isLoggingEnabled: false }).then((data) => {
+  settings.disableOnSubs = data.disableOnSubs || false;
+  settings.isEnabled = data.isEnabled !== undefined ? data.isEnabled : true;
+  settings.isLoggingEnabled = data.isLoggingEnabled || false;
+
   if (!settings.isEnabled) {
+    console.log("PureGlance: Extension disabled after loading settings.");
     unhideAllVideos();
+    return;  // Exit early, no setup
+  }
+
+  if (settings.isLoggingEnabled) {
+    console.log("PureGlance: Extension enabled and starting scan.");
+  }
+
+  // Initial scan and start observing
+  if (siteModule) {
+    scanForThumbnails();
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
   }
 });
 
@@ -42,12 +62,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
   }
 });
-
-if (hostname.includes("youtube.com")) {
-  siteModule = window.PureGlanceModules.youtube;
-} else if (hostname.includes("vk.com") || hostname.includes("vkvideo.ru")) {
-  siteModule = window.PureGlanceModules.vkvideo;
-}
 
 // 2. Thumbnail Processing and hiding logic
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -162,13 +176,22 @@ async function processThumbnail(element) {
 // 3. Observers
 function scanForThumbnails() {
   if (!settings.isEnabled || (siteModule.isSubscriptionFeed() && settings.disableOnSubs) || siteModule.isProtectedPages())  {
+    if (settings.isLoggingEnabled) {
+      console.log("PureGlance: Skipping scan - disabled or protected page.");
+    }
     unhideAllVideos();
     return;
   }
   if (!siteModule || !siteModule.thumbnailSelector) {
+    if (settings.isLoggingEnabled) {
+      console.log("PureGlance: No site module or selector available.");
+    }
     return;
   }
   const thumbnails = document.querySelectorAll(siteModule.thumbnailSelector);
+  if (settings.isLoggingEnabled) {
+    console.log(`PureGlance: Scanning ${thumbnails.length} thumbnails.`);
+  }
   thumbnails.forEach((element) => {
     if (!element.dataset.pureglanceId || element.dataset.pureglanceId == '') {
       processThumbnail(element);
@@ -193,10 +216,4 @@ function debounce(func, delay) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(context, args), delay);
   };
-}
-
-// Initial scan and start observing
-if (siteModule) {
-  scanForThumbnails();
-  mutationObserver.observe(document.body, { childList: true, subtree: true });
 }

@@ -17,7 +17,7 @@ window.PureGlanceModules.youtube = {
       "ytd-grid-video-renderer", // Grid view (e.g., channel page)
       "ytd-compact-video-renderer", // Sidebar (up next)
       "ytd-video-renderer", // Subscriptions page
-      "yt-lockup-view-model", // End of video recommendations
+      "yt-lockup-view-model", // Sidebar
     ];
 
     for (const selector of selectors) {

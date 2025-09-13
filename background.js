@@ -384,6 +384,8 @@ async function messageListener(request, sender, sendResponse) {
           }
           // Start processing if not already active
           processQueue();
+        } else if (isLoggingEnabled) {
+          console.log(`PureGlance: Detection for ${request.id} skipped - extension disabled.`);
         }
       }
       return true;
@@ -484,6 +486,32 @@ function notifyPopupOfCountChange(tabId) {
       // Suppress error if popup is not open
     });
 }
+
+chrome.runtime.onInstalled.addListener(async () => {
+  const defaults = {
+    isEnabled: true,
+    isLoggingEnabled: false,
+    threshold: 5,
+    faceCountThreshold: 2,
+    isAreaThresholdEnabled: true,
+    isFaceCountEnabled: true,
+    disableOnSubs: true,
+  };
+
+  const stored = await getStorageData(Object.keys(defaults));
+  const toSet = {};
+
+  for (const key in defaults) {
+    if (stored[key] === undefined) {
+      toSet[key] = defaults[key];
+    }
+  }
+
+  if (Object.keys(toSet).length > 0) {
+    await setStorageData(toSet);
+    console.log("PureGlance: Set storage defaults:", toSet);
+  }
+});
 
 // Initialize Firefox detector on startup
 if (!isChrome) {

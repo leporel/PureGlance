@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     isEnabled: true,
     isLoggingEnabled: false,
     threshold: 5,
-    disableOnSubs: false,
+    disableOnSubs: true,
     faceCountThreshold: 2,
     isAreaThresholdEnabled: true,
     isFaceCountEnabled: true,
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (error) {
       console.error('PureGlance: Error getting video count in tab: ${currentTabId}', error);
-      videoCountElement.textContent = "Hidden Videos on this page: N/A";
+      // videoCountElement.textContent = "Hidden Videos on this page: N/A";
     }
   }
 
