@@ -57,6 +57,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     if (!settings.isEnabled) {
       unhideAllVideos();
     } else {
+      reHideVideos();
       // When enabling, re-scan to process existing thumbnails
       scanForThumbnails();
     }
@@ -88,13 +89,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-function unhideAllVideos() {
-  document.querySelectorAll('[data-pureglance-hidden="true"]').forEach((el) => {
+async function unhideAllVideos() {
+  const hiddenEls = document.querySelectorAll('[data-pureglance-hidden="true"]');
+  hiddenEls.forEach((el) => {
     el.style.display = "";
-    delete el.dataset.pureglanceHidden;
-    delete el.dataset.pureglanceId;
+    // Keep datasets to allow quick re-hiding on re-enable
   });
-  chrome.runtime.sendMessage({ type: "RESET_COUNT" });
+
+  if (settings.isLoggingEnabled) {
+    console.log(`PureGlance: Unhiding all videos.`);
+  }
 }
 
 async function processThumbnail(element) {
@@ -171,6 +175,23 @@ async function processThumbnail(element) {
   };
 
   img.src = thumbnailUrl;
+}
+
+async function reHideVideos() {
+  const hiddenEls = document.querySelectorAll('[data-pureglance-hidden="true"]');
+  if (hiddenEls.length === 0) return;
+
+  if (settings.isLoggingEnabled) {
+    console.log(`PureGlance: Re-hiding ${hiddenEls.length} previously hidden videos.`);
+  }
+
+  hiddenEls.forEach((el) => {
+    const container = siteModule?.findVideoContainer(el) || el;
+    if (container) {
+      container.style.display = "none";
+    }
+  });
+
 }
 
 // 3. Observers

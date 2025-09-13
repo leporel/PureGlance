@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (error) {
       console.error('PureGlance: Error getting video count in tab: ${currentTabId}', error);
-      // videoCountElement.textContent = "Hidden Videos on this page: N/A";
+      videoCountElement.textContent = "Hidden Videos on this page: N/A";
     }
   }
 
