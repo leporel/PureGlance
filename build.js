@@ -17,9 +17,12 @@ async function build() {
         const commonFiles = [
             'content_scripts',
             'icons',
-            'models',
             'popup'
         ];
+
+        // Only the model file actually referenced by background.js /
+        // offscreen.js should ship in the release build.
+        const activeModelFile = 'blaze_face_full_range_sparse.tflite';
 
         const chromeOnlyFiles = [
             'offscreen'
@@ -34,6 +37,12 @@ async function build() {
             }
         }
         console.log('Copied common files.');
+
+        // 3b. Copy only the active face detection model.
+        const modelSrc = path.join(__dirname, 'models', activeModelFile);
+        await fs.copy(modelSrc, path.join(chromeDir, 'models', activeModelFile));
+        await fs.copy(modelSrc, path.join(firefoxDir, 'models', activeModelFile));
+        console.log('Copied active model file.');
 
         // 4. Copy Chrome-only files
         for (const file of chromeOnlyFiles) {

@@ -3,17 +3,33 @@ window.PureGlanceModules = window.PureGlanceModules || {};
 
 window.PureGlanceModules.vkvideo = {
   // Selector for finding thumbnail containers on VK Video and VK.com.
-  thumbnailSelector: ".VideoCard[data-thumb], ._video_item[data-thumb]",
+  // VK's "vkit" component redesign dropped the [data-thumb] attribute in favor
+  // of a plain <img> inside an anchor marked with a stable data-testid.
+  thumbnailSelector:
+    `.VideoCard[data-thumb], ._video_item[data-thumb],
+     a[data-testid="video_card_thumb"] img:not([data-pureglance-id])`,
 
   // Function to get the thumbnail source URL from the element.
   getThumbnailSrc: function (element) {
-    return element.dataset.thumb;
+    return element.dataset.thumb || element.src;
   },
 
   // Function to find the main container of a video on VK.
   findVideoContainer: function (element) {
-    // Selector for vkvideo.ru and modern vk.com pages
-    const container = element.closest('.VideoCard, ._video_item, div[data-testid="catalog_item_video"]');
+    // Prefer the outer grid cell (main feed) so hiding a video doesn't leave
+    // an empty slot behind - it's an ancestor of video_card_layout, and
+    // closest() with a combined selector would otherwise match the nearer,
+    // inner node first.
+    const gridItem = element.closest('div[data-testid="grid-item"]');
+    if (gridItem) {
+      return gridItem;
+    }
+
+    // Selector for vkvideo.ru and modern vk.com pages (e.g. sidebar cards
+    // that aren't wrapped in a grid-item).
+    const container = element.closest(
+      '.VideoCard, ._video_item, div[data-testid="catalog_item_video"], div[data-testid="video_card_layout"]'
+    );
     if (container) {
       return container;
     }

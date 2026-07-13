@@ -6,6 +6,7 @@ window.PureGlanceModules.youtube = {
   thumbnailSelector:
     `a#thumbnail img.yt-core-image:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id]),
      a.yt-lockup-view-model__content-image img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id]),
+     a.ytLockupViewModelContentImage img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id]),
      a#thumbnail img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id]),
      a.ytd-thumbnail img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id]),
      a[src*="watch?v"] img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id])`,

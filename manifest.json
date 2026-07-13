@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "PureGlance",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Hides videos where a face occupies a large portion of the thumbnail.",
   "icons": {
     "16": "icons/icon16.png",
@@ -58,7 +58,7 @@
     {
       "resources": [
         "node_modules/@mediapipe/tasks-vision/vision_bundle.mjs",
-        "node_modules/@mediapipe/tasks-vision/vision_bundle.cjs", 
+        "node_modules/@mediapipe/tasks-vision/vision_bundle.cjs",
         "node_modules/@mediapipe/tasks-vision/wasm/*"
       ],
       "matches": [

@@ -21,7 +21,7 @@ async function setupFaceDetector() {
     faceDetector = await FaceDetector.createFromOptions(vision, {
       baseOptions: {
         modelAssetPath: chrome.runtime.getURL(
-          "models/blaze_face_short_range.tflite"
+          "models/blaze_face_full_range_sparse.tflite"
         ),
         delegate: "GPU",
       },
