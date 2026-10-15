@@ -11,6 +11,12 @@ function getStorageData(keys) {
 
 let idCounter = 0;
 
+// Videos hidden on the current page, keyed by pureglance id. Kept here (not in
+// the background) because only the page knows titles and links; reset on navigation.
+const hiddenVideos = new Map();
+// Guards against oversized strings from page markup reaching the popup.
+const MAX_TITLE_LENGTH = 200;
+
 // 1. Site-specific module selection
 let siteModule;
 const hostname = window.location.hostname;
@@ -71,23 +77,65 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       `[data-pureglance-id="${message.id}"]`
     );
     if (elementToHide && siteModule) {
-      const container = siteModule.findVideoContainer(elementToHide);
-      if (container) {
-        container.style.display = "none";
-        container.dataset.pureglanceHidden = "true";
-      } else {
-        // Fallback for cases where a container is not found
-        elementToHide.style.display = "none";
-        elementToHide.dataset.pureglanceHidden = "true";
-      }
+      // Fallback to the thumbnail itself for cases where a container is not found
+      const container = siteModule.findVideoContainer(elementToHide) || elementToHide;
+      container.style.display = "none";
+      container.dataset.pureglanceHidden = "true";
+      hiddenVideos.set(
+        message.id,
+        describeVideo(message.id, elementToHide, container, message.reason)
+      );
     }
   }
 
+  if (message.type === "GET_HIDDEN_VIDEOS") {
+    sendResponse({ videos: Array.from(hiddenVideos.values()) });
+  }
+
   if (message.type === "URL_CHANGED") {
+    hiddenVideos.clear();
     // A navigation event occurred, rescan the page.
     scanForThumbnails();
   }
 });
+
+function getThumbnailUrl(element) {
+  return siteModule.getThumbnailSrc
+    ? siteModule.getThumbnailSrc(element)
+    : element.src;
+}
+
+function normalizeText(text) {
+  return (text || "").replace(/\s+/g, " ").trim().slice(0, MAX_TITLE_LENGTH);
+}
+
+function findFirst(root, selectors) {
+  for (const selector of selectors) {
+    const match = root.querySelector(selector);
+    if (match) return match;
+  }
+  return null;
+}
+
+// Collects what the popup needs to show a hidden video: preview, title and link.
+function describeVideo(id, thumbnailElement, container, reason) {
+  const link =
+    thumbnailElement.closest("a[href]") ||
+    container.querySelector(siteModule.videoLinkSelector);
+  const titleElement = findFirst(container, siteModule.titleSelectors);
+  const title =
+    titleElement?.getAttribute("title") ||
+    titleElement?.textContent ||
+    thumbnailElement.alt;
+
+  return {
+    id,
+    thumbnail: getThumbnailUrl(thumbnailElement) || "",
+    url: link?.href || "",
+    title: normalizeText(title),
+    reason: normalizeText(reason),
+  };
+}
 
 async function unhideAllVideos() {
   const hiddenEls = document.querySelectorAll('[data-pureglance-hidden="true"]');
@@ -106,10 +154,7 @@ async function processThumbnail(element) {
     return;
   }
 
-  // Use module-specific function to get URL, or fallback to src
-  const thumbnailUrl = siteModule.getThumbnailSrc
-    ? siteModule.getThumbnailSrc(element)
-    : element.src;
+  const thumbnailUrl = getThumbnailUrl(element);
 
   if (!thumbnailUrl) {
     return;

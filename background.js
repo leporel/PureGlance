@@ -292,6 +292,8 @@ async function handleDetectionResult(request) {
 
     let shouldHide = false;
     let reason = "";
+    // Short human-readable explanation shown in the popup's hidden-video list.
+    let displayReason = "";
 
     if (
       isFaceCountEnabled &&
@@ -300,6 +302,7 @@ async function handleDetectionResult(request) {
     ) {
       shouldHide = true;
       reason = `due to face count (${detections.length} > ${faceCountThreshold})`;
+      displayReason = `${detections.length} faces detected`;
     }
 
     if (!shouldHide && isAreaThresholdEnabled) {
@@ -331,6 +334,7 @@ async function handleDetectionResult(request) {
           reason = `due to large face ratio (${ratio.toFixed(4)} >= ${
             threshold / 100
           })`;
+          displayReason = `Face covers ${Math.round(ratio * 100)}% of thumbnail`;
           break;
         }
       }
@@ -349,6 +353,7 @@ async function handleDetectionResult(request) {
         .sendMessage(tabId, {
           type: "HIDE_VIDEO",
           id: id,
+          reason: displayReason,
         })
         .catch(() => {
           /* Suppress error */
@@ -436,8 +441,7 @@ async function messageListener(request, sender, sendResponse) {
 
     case "RESET_COUNT":
       if (sender && sender.tab && sender.tab.id) {
-        hiddenVideoCountPerTab.set(sender.tab.id, 0);
-        notifyPopupOfCountChange(sender.tab.id);
+        resetTabCount(sender.tab.id);
       }
       return true;
   }
@@ -445,6 +449,37 @@ async function messageListener(request, sender, sendResponse) {
 }
 
 chrome.runtime.onMessage.addListener(messageListener);
+
+function resetTabCount(tabId) {
+  hiddenVideoCountPerTab.set(tabId, 0);
+  notifyPopupOfCountChange(tabId);
+}
+
+// Drops detections queued or in flight for a tab whose document was replaced.
+// The new page restarts its pureglance ids from zero, so a stale result would
+// hide an unrelated video that happens to reuse the same id.
+function discardTabJobs(tabId) {
+  detectionQueue = detectionQueue.filter((item) => item.tabId !== tabId);
+  for (const [jobId, jobTabId] of jobToTab) {
+    if (jobTabId === tabId) {
+      jobToTab.delete(jobId);
+    }
+  }
+}
+
+// Full page loads (reload, typed URL, link without SPA routing) start a fresh document.
+chrome.webNavigation.onCommitted.addListener((details) => {
+  if (details.frameId !== 0) {
+    return;
+  }
+  discardTabJobs(details.tabId);
+  resetTabCount(details.tabId);
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  discardTabJobs(tabId);
+  hiddenVideoCountPerTab.delete(tabId);
+});
 
 chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
   // Filter for main frame navigations on supported sites
@@ -455,15 +490,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener((details) => {
       details.url.includes("vk.com") ||
       details.url.includes("vkvideo.ru"))
   ) {
-    // Reset the counter for the tab
-    hiddenVideoCountPerTab.set(details.tabId, 0);
-
-    // Notify the popup to update the count
-    chrome.runtime
-      .sendMessage({ type: "hidden-video-count", count: 0 })
-      .catch(() => {
-        /* Suppress error */
-      });
+    resetTabCount(details.tabId);
 
     // Notify the content script that the page has changed
     chrome.tabs

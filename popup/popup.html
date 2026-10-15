@@ -1,62 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="color-scheme" content="dark">
   <title>PureGlance</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
-  <div class="container">
-    <img src="../icons/icon48.png" alt="icon" class="header-icon"> <h1>PureGlance</h1>
-    <label class="switch">
-      <input type="checkbox" id="toggleSwitch">
-      <span class="slider round"></span>
-    </label>
-  </div>
-  <div id="settings-wrapper">
-    <div class="container">
-    <span>Enable Debug Logging</span>
-    <label class="switch small">
-      <input type="checkbox" id="toggleLogging">
-      <span class="slider round"></span>
-    </label>
+  <header class="header">
+    <img src="../icons/icon48.png" alt="" class="header-icon">
+    <div class="header-text">
+      <h1>PureGlance</h1>
+      <p class="header-status" id="statusText">Filtering is on</p>
     </div>
-    <div class="container">
-      <span>Disable on Subscriptions page</span>
-      <label class="switch small">
-        <input type="checkbox" id="disableOnSubsSwitch">
-        <span class="slider round"></span>
-      </label>
-    </div>
-    <div class="settings-container">
-      <div class="setting-label">
-        <span>Face Area Threshold</span>
+    <label class="switch" data-tip="Turn face filtering on or off on all supported sites.">
+      <input type="checkbox" id="toggleSwitch" aria-label="Enable PureGlance">
+      <span class="switch-track"></span>
+    </label>
+  </header>
+
+  <main id="settings-wrapper">
+    <section class="card">
+      <h2 class="card-title">Detection rules</h2>
+
+      <div class="rule">
+        <div class="row">
+          <span class="row-label">
+            Face size
+            <button type="button" class="info" aria-label="About face size"
+              data-tip="Hides a video when one face takes up at least this share of the thumbnail. Lower value = stricter filter.">?</button>
+          </span>
+          <label class="switch small">
+            <input type="checkbox" id="enableAreaThreshold" aria-label="Enable face size rule">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div class="range-row">
+          <input type="range" id="thresholdSlider" min="1" max="50" value="5" aria-label="Face size threshold">
+          <output class="value-pill" id="thresholdValue">5%</output>
+        </div>
+      </div>
+
+      <div class="rule">
+        <div class="row">
+          <span class="row-label">
+            Max faces
+            <button type="button" class="info" aria-label="About max faces"
+              data-tip="Hides a video when the thumbnail shows more faces than this number. 0 hides any thumbnail with a face.">?</button>
+          </span>
+          <label class="switch small">
+            <input type="checkbox" id="enableFaceCount" aria-label="Enable max faces rule">
+            <span class="switch-track"></span>
+          </label>
+        </div>
+        <div class="range-row">
+          <input type="range" id="faceCountSlider" min="0" max="10" value="2" aria-label="Max faces threshold">
+          <output class="value-pill" id="faceCountValue">2</output>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Behavior</h2>
+      <div class="row">
+        <span class="row-label">
+          Skip Subscriptions
+          <button type="button" class="info" aria-label="About skip subscriptions"
+            data-tip="Don't filter your Subscriptions feed, so videos from channels you follow are always shown.">?</button>
+        </span>
         <label class="switch small">
-            <input type="checkbox" id="enableAreaThreshold">
-            <span class="slider round"></span>
+          <input type="checkbox" id="disableOnSubsSwitch" aria-label="Skip Subscriptions page">
+          <span class="switch-track"></span>
         </label>
       </div>
-      <div class="setting-control">
-        <input type="range" id="thresholdSlider" min="1" max="50" value="5">
-        <span id="thresholdValue">5%</span>
+      <div class="row">
+        <span class="row-label">
+          Debug logging
+          <button type="button" class="info" aria-label="About debug logging"
+            data-tip="Writes detection details to the browser console. Only needed for troubleshooting.">?</button>
+        </span>
+        <label class="switch small">
+          <input type="checkbox" id="toggleLogging" aria-label="Enable debug logging">
+          <span class="switch-track"></span>
+        </label>
       </div>
+    </section>
+  </main>
+
+  <section class="card hidden-videos">
+    <button type="button" class="hidden-toggle" id="hiddenToggle" aria-expanded="false" aria-controls="hiddenList"
+      data-tip="Videos hidden on the current page. Expand to preview them and click one to open it.">
+      <span>Hidden on this page</span>
+      <span class="hidden-toggle-end">
+        <span class="count-badge" id="videoCount">–</span>
+        <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg>
+      </span>
+    </button>
+    <div class="hidden-panel" id="hiddenList" hidden>
+      <div class="thumb-grid" id="thumbGrid"></div>
+      <p class="empty-state" id="emptyState">Nothing hidden on this page yet.</p>
     </div>
-    <div class="settings-container">
-      <div class="setting-label">
-          <span>Min Face Count</span>
-          <label class="switch small">
-              <input type="checkbox" id="enableFaceCount">
-              <span class="slider round"></span>
-          </label>
-      </div>
-      <div class="setting-control">
-        <input type="range" id="faceCountSlider" min="0" max="10" value="2">
-        <span id="faceCountValue">2</span>
-      </div>
-    </div>
+  </section>
+
+  <div class="tooltip" id="tooltip" role="tooltip" hidden>
+    <img class="tooltip-image" id="tooltipImage" alt="" referrerpolicy="no-referrer" hidden>
+    <span class="tooltip-text" id="tooltipText"></span>
+    <span class="tooltip-sub" id="tooltipSub"></span>
   </div>
-  <div id="videoCount">Hidden Videos on this page: N/A</div>
+
   <script src="popup.js"></script>
 </body>
 

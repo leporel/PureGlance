@@ -11,6 +11,17 @@ window.PureGlanceModules.youtube = {
      a.ytd-thumbnail img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id]),
      a[src*="watch?v"] img.ytCoreImageHost:only-child:not([src*="avatar"]):not(.yt-spec-avatar-shape__image):not([data-pureglance-id])`,
 
+  // Selectors used inside a video container to describe a hidden video in the
+  // popup. Titles are tried in priority order, most specific first.
+  titleSelectors: [
+    "#video-title",
+    ".yt-lockup-metadata-view-model__title",
+    ".ytLockupMetadataViewModelTitle",
+    "h3 a[title]",
+    "h3",
+  ],
+  videoLinkSelector: `a[href*="/watch?v="], a[href*="/shorts/"]`,
+
   // Function to find the main container of a video to hide it.
   findVideoContainer: function (element) {
     const selectors = [

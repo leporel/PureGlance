@@ -1,6 +1,6 @@
 {
   "name": "pureglance",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Hides videos where a face occupies a large portion of the thumbnail.",
   "scripts": {
     "build": "node build.js"

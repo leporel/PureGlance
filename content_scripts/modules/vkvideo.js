@@ -9,6 +9,17 @@ window.PureGlanceModules.vkvideo = {
     `.VideoCard[data-thumb], ._video_item[data-thumb],
      a[data-testid="video_card_thumb"] img:not([data-pureglance-id])`,
 
+  // Selectors used inside a video container to describe a hidden video in the
+  // popup. Titles are tried in priority order, most specific first.
+  titleSelectors: [
+    '[data-testid="video_card_title"]',
+    ".VideoCard__title",
+    ".video_item_title",
+    "._video_item_title",
+    "a[title]",
+  ],
+  videoLinkSelector: `a[href*="video"], a[href*="clip"]`,
+
   // Function to get the thumbnail source URL from the element.
   getThumbnailSrc: function (element) {
     return element.dataset.thumb || element.src;
